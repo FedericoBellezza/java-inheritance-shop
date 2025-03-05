@@ -10,6 +10,9 @@ public class Prodotto {
     private String marca;
     private BigDecimal prezzo;
     private BigDecimal iva;
+    protected BigDecimal prezzoConIva;
+    protected BigDecimal sconto;
+    protected BigDecimal prezzoScontato;
 
     // costruttori
     public Prodotto(String nome, String marca, BigDecimal prezzo, BigDecimal iva) { 
@@ -18,6 +21,9 @@ public class Prodotto {
         this.marca = marca;
         this.prezzo = prezzo;
         this.iva =  iva.setScale(2, RoundingMode.DOWN);;
+        this.prezzoConIva = (this.prezzo.add( this.prezzo.multiply(this.iva))).setScale(2, RoundingMode.DOWN);
+        this.sconto = new BigDecimal(0.02);
+        this.prezzoScontato = (prezzoConIva.subtract(prezzoConIva.multiply(sconto))).setScale(2, RoundingMode.DOWN);
     }
 
     // setters
@@ -40,14 +46,21 @@ public class Prodotto {
     }
 
     public void setIva(BigDecimal iva) {
-       if (iva.compareTo(BigDecimal.ZERO) >= 0) { 
         this.iva = iva.setScale(2, RoundingMode.DOWN); 
-    };
+    }
+
+    public void setSconto(BigDecimal sconto) {
+            this.sconto = sconto.setScale(2, RoundingMode.DOWN); 
     }
 
     // getters
     public String getProduct(){
-        return (this.codice + " - " + this.nome + ":\n- marca: " + this.marca + "\n- prezzo: " + this.prezzo + "\n- iva: " + (this.iva.multiply(new BigDecimal(100))).setScale(0, RoundingMode.DOWN) + "%");
+        return (this.codice + " - " + this.nome + 
+        ":\n- marca: " + this.marca + 
+        "\n- prezzo: " + (this.prezzo.add( this.prezzo.multiply(this.iva))).setScale(2, RoundingMode.DOWN) + " euro" +
+        "\n- iva: " + (this.iva.multiply(new BigDecimal(100))).setScale(0, RoundingMode.DOWN) + "%") +
+        "\n- prezzo scontato del " + (this.sconto.multiply(new BigDecimal(100))).setScale(0, RoundingMode.DOWN) + "%: " + this.prezzoScontato + " euro";
+
     }
 
     public int getCodice() {
@@ -77,10 +90,14 @@ public class Prodotto {
     public void stampaPrezzo(){
         System.out.println("Il prezzo del prodotto e': " + this.prezzo + " euro");  
     }
+
     public void stampaPrezzoconIva(){
-        System.out.println("Il prezzo del prodotto con iva e': " + (this.prezzo.add( this.prezzo.multiply(this.iva))).setScale(2, RoundingMode.DOWN) + " euro");
+        System.out.println(prezzoConIva + " euro");
     }
     public void stampaNomeCompleto(){
         System.out.println("Il nome del completo del prodotto e': " + this.codice + "-" + this.nome);
+    }
+    public void stampaPrezzoScontato(){ 
+        System.out.println(prezzoScontato + " euro");
     }
 }
